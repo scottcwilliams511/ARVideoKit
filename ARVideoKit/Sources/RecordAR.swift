@@ -223,6 +223,8 @@ import PhotosUI
         return URL(fileURLWithPath: vidPath, isDirectory: false)
     }
     
+    public var userVideoPath: URL?
+    
     //MARK: - Video Setup
     func setup() {
         if let view = view as? ARSCNView {
@@ -812,7 +814,11 @@ extension RecordAR {
                         self.delegate?.recorder(didEndRecording: self.currentVideoPath!, with: false)
                     }
                 } else {
-                    self.currentVideoPath = self.newVideoPath
+                    if let userVidepPath = userVideoPath {
+                        self.currentVideoPath = userVidepPath
+                    } else {
+                        self.currentVideoPath = self.newVideoPath
+                    }
                     
                     self.writer = WritAR(output: self.currentVideoPath!, width: Int(size.width), height: Int(size.height), adjustForSharing: self.adjustVideoForSharing, audioEnabled: self.enableAudio, orientaions: self.inputViewOrientations, queue: self.writerQueue, allowMix: self.enableMixWithOthers)
                     self.writer?.videoInputOrientation = self.videoOrientation
