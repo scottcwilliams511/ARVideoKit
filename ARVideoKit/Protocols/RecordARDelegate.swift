@@ -22,6 +22,8 @@ import ARKit
  */
 @available(iOS 11.0, *)
 @objc public protocol RecordARDelegate {
+    func recorder(didStartRecording path: URL)
+    
     /**
      A protocol method that is triggered when a recorder ends recording.
      - parameter path: A `URL` object that returns the video file path.
