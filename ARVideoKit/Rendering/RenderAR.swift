@@ -61,6 +61,9 @@ struct RenderAR {
                 let targetSize = AVMakeRect(aspectRatio: viewSize, insideRect: CGRect(x: 0, y: 0, width: bufferWidth, height: bufferHeight)).size
                 width = Int(targetSize.width)
                 height = Int(targetSize.height)
+            case .low:
+                width = 192
+                height = 144
             default:
                 if UIScreen.main.isNotch {
                     width = Int(UIScreen.main.nativeBounds.width)
