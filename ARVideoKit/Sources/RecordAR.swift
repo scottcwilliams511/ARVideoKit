@@ -125,6 +125,9 @@ import PhotosUI
         }
     }
     
+    public var userVideoPath: URL?
+    public var videoCodec: AVVideoCodecType?
+    
     //MARK: - Public initialization methods
     /**
      Initialize 🌞🍳 `RecordAR` with an `ARSCNView` 🚀.
@@ -223,7 +226,6 @@ import PhotosUI
         return URL(fileURLWithPath: vidPath, isDirectory: false)
     }
     
-    public var userVideoPath: URL?
     
     //MARK: - Video Setup
     func setup() {
@@ -820,7 +822,7 @@ extension RecordAR {
                         self.currentVideoPath = self.newVideoPath
                     }
                     
-                    self.writer = WritAR(output: self.currentVideoPath!, width: Int(size.width), height: Int(size.height), adjustForSharing: self.adjustVideoForSharing, audioEnabled: self.enableAudio, orientaions: self.inputViewOrientations, queue: self.writerQueue, allowMix: self.enableMixWithOthers)
+                    self.writer = WritAR(output: self.currentVideoPath!, width: Int(size.width), height: Int(size.height), adjustForSharing: self.adjustVideoForSharing, audioEnabled: self.enableAudio, orientaions: self.inputViewOrientations, queue: self.writerQueue, allowMix: self.enableMixWithOthers, videoCodec: self.videoCodec)
                     self.writer?.videoInputOrientation = self.videoOrientation
                     self.writer?.delegate = self.delegate
                 }

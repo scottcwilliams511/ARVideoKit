@@ -28,7 +28,7 @@ class WritAR: NSObject, AVCaptureAudioDataOutputSampleBufferDelegate {
     weak var delegate: RecordARDelegate?
     var videoInputOrientation: ARVideoOrientation = .auto
 
-    init(output: URL, width: Int, height: Int, adjustForSharing: Bool, audioEnabled: Bool, orientaions:[ARInputViewOrientation], queue: DispatchQueue, allowMix: Bool) {
+    init(output: URL, width: Int, height: Int, adjustForSharing: Bool, audioEnabled: Bool, orientaions:[ARInputViewOrientation], queue: DispatchQueue, allowMix: Bool, videoCodec: AVVideoCodecType? = nil) {
         super.init()
         do {
             assetWriter = try AVAssetWriter(outputURL: output, fileType: AVFileType.mp4)
@@ -56,6 +56,10 @@ class WritAR: NSObject, AVCaptureAudioDataOutputSampleBufferDelegate {
             AVVideoWidthKey: width as AnyObject,
             AVVideoHeightKey: height as AnyObject
         ]
+        
+        if let videoCodec = videoCodec {
+            videoOutputSettings[AVVideoCodecKey] = videoCodec as AnyObject
+        }
         
         let attributes: [String: Bool] = [
             kCVPixelBufferCGImageCompatibilityKey as String: true,
