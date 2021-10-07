@@ -18,7 +18,7 @@ class WritAR: NSObject, AVCaptureAudioDataOutputSampleBufferDelegate {
     private var session: AVCaptureSession!
     
     private var pixelBufferInput: AVAssetWriterInputPixelBufferAdaptor!
-    private var videoOutputSettings: Dictionary<String, AnyObject>!
+    private var videoOutputSettings: [String: Any]!
     private var audioSettings: [String: Any]?
 
     let audioBufferQueue = DispatchQueue(label: "com.ahmedbekhit.AudioBufferQueue")
@@ -27,11 +27,15 @@ class WritAR: NSObject, AVCaptureAudioDataOutputSampleBufferDelegate {
     
     weak var delegate: RecordARDelegate?
     var videoInputOrientation: ARVideoOrientation = .auto
+    
+    var url: URL;
 
     init(output: URL, width: Int, height: Int, adjustForSharing: Bool, audioEnabled: Bool, orientaions:[ARInputViewOrientation], queue: DispatchQueue, allowMix: Bool, videoCodec: AVVideoCodecType? = nil) {
+        url = output
         super.init()
         do {
             assetWriter = try AVAssetWriter(outputURL: output, fileType: AVFileType.mp4)
+            print(assetWriter.directoryForTemporaryFiles)
         } catch {
             // FIXME: handle when failed to allocate AVAssetWriter.
             return
@@ -52,19 +56,22 @@ class WritAR: NSObject, AVCaptureAudioDataOutputSampleBufferDelegate {
         //HEVC file format only supports A10 Fusion Chip or higher.
         //to support HEVC, make sure to check if the device is iPhone 7 or higher
         videoOutputSettings = [
-            AVVideoCodecKey: AVVideoCodecType.h264 as AnyObject,
-            AVVideoWidthKey: width as AnyObject,
-            AVVideoHeightKey: height as AnyObject
+            AVVideoCodecKey: AVVideoCodecType.h264,
+            AVVideoWidthKey: width,
+            AVVideoHeightKey: height,
+            AVVideoScalingModeKey: AVVideoScalingModeResizeAspectFill,
+            AVVideoCompressionPropertiesKey: [
+                AVVideoAverageBitRateKey: 128000,
+                AVVideoMaxKeyFrameIntervalDurationKey: 1,
+                AVVideoProfileLevelKey: AVVideoProfileLevelH264Baseline30,
+                AVVideoExpectedSourceFrameRateKey: 15,
+            ],
         ]
         
         if let videoCodec = videoCodec {
-            videoOutputSettings[AVVideoCodecKey] = videoCodec as AnyObject
+            videoOutputSettings[AVVideoCodecKey] = videoCodec;
         }
         
-        let attributes: [String: Bool] = [
-            kCVPixelBufferCGImageCompatibilityKey as String: true,
-            kCVPixelBufferCGBitmapContextCompatibilityKey as String: true
-        ]
         videoInput = AVAssetWriterInput(mediaType: .video, outputSettings: videoOutputSettings)
 
         videoInput.expectsMediaDataInRealTime = true
@@ -185,6 +192,15 @@ class WritAR: NSObject, AVCaptureAudioDataOutputSampleBufferDelegate {
                 currentDuration = 0
                 isRecording = true
                 isWritingWithoutError = true
+                delegate?.recorder(didStartRecording: url)
+                #if DEBUG
+                print("\n---------- List of video recording settings ----------")
+                for ele in assetWriter.inputs.enumerated() {
+                    let writerInput = ele.element
+                    print("\(ele.offset + 1)) ", writerInput.outputSettings)
+                }
+                print("------------------------------------------------------\n")
+                #endif
             } else {
                 delegate?.recorder(didFailRecording: assetWriter.error, and: "An error occurred while starting the video session.")
                 currentDuration = 0

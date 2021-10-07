@@ -825,8 +825,6 @@ extension RecordAR {
                     self.writer = WritAR(output: self.currentVideoPath!, width: Int(size.width), height: Int(size.height), adjustForSharing: self.adjustVideoForSharing, audioEnabled: self.enableAudio, orientaions: self.inputViewOrientations, queue: self.writerQueue, allowMix: self.enableMixWithOthers, videoCodec: self.videoCodec)
                     self.writer?.videoInputOrientation = self.videoOrientation
                     self.writer?.delegate = self.delegate
-                    
-                    self.delegate?.recorder(didStartRecording: self.currentVideoPath!)
                 }
             } else if !self.isRecording && self.adjustPausedTime {
                 writer?.pause()
